@@ -1,15 +1,15 @@
-const User = require('../models/user');
+const User = require('../models/user.js');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => res.send({ message: err.message }));
+    .catch((err) => res.status(500).send({ message: err.message }));
 };
 
 module.exports.getUser = (req, res) => {
   User.findById(req.params.id)
     .then((user) => res.send(user))
-    .catch((err) => res.send({ message: err.message }));
+    .catch((err) => res.status(500).send({ message: err.message }));
 };
 
 module.exports.createUser = (req, res) => {

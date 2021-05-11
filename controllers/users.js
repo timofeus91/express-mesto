@@ -1,15 +1,27 @@
 const User = require('../models/user.js');
 
+const ERROR_CODE500_MESSAGE = 'Ошибка по умолчанию. Проверь код';
+const ERROR_CODE400_MESSAGE = 'Переданы некорректные данные';
+const ERROR_CODE404_MESSAGE_USER = 'По данному id пользователь не найден';
+
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(() => res.status(500).send({ message: ERROR_CODE500_MESSAGE }));
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.params.id)
+  User.findById(req.params.userId)
     .then((user) => res.send(user))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(404).send({ message: ERROR_CODE404_MESSAGE_USER });
+      } else if (err.name === 'NotFound') {
+        res.status(404).send({ message: ERROR_CODE404_MESSAGE_USER });
+      } else {
+        res.send({ message: ERROR_CODE500_MESSAGE });
+      }
+    });
 };
 
 module.exports.createUser = (req, res) => {
@@ -17,7 +29,13 @@ module.exports.createUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((user) => res.send(user))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: ERROR_CODE400_MESSAGE });
+      } else {
+        res.send({ message: ERROR_CODE500_MESSAGE });
+      }
+    });
 };
 
 module.exports.updateInfo = (req, res) => {
@@ -25,7 +43,15 @@ module.exports.updateInfo = (req, res) => {
 
   User.findByIdAndUpdate(req.user._id, { name, about })
     .then((user) => res.send(user))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: ERROR_CODE400_MESSAGE });
+      } else if (err.name === 'NotFound') {
+        res.status(404).send({ message: ERROR_CODE404_MESSAGE_USER });
+      } else {
+        res.send({ message: ERROR_CODE500_MESSAGE });
+      }
+    });
 };
 
 module.exports.updateAvatar = (req, res) => {
@@ -33,5 +59,13 @@ module.exports.updateAvatar = (req, res) => {
 
   User.findByIdAndUpdate(req.user._id, { avatar })
     .then((user) => res.send(user))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: ERROR_CODE400_MESSAGE });
+      } else if (err.name === 'NotFound') {
+        res.status(404).send({ message: ERROR_CODE404_MESSAGE_USER });
+      } else {
+        res.send({ message: ERROR_CODE500_MESSAGE });
+      }
+    });
 };

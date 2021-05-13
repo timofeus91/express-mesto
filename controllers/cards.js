@@ -3,7 +3,6 @@ const Card = require('../models/card.js');
 const ERROR_CODE500_MESSAGE = 'Ошибка по умолчанию. Проверь код';
 const ERROR_CODE400_MESSAGE = 'Переданы некорректные данные';
 const ERROR_CODE404_MESSAGE_CARD = 'По данному id карточка не найдена';
-const ERROR_CODE400_MESSAGE_CARD_LIKE = 'Переданы некорректные данные или неверный id';
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -17,21 +16,22 @@ module.exports.createCard = (req, res) => {
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         res.status(400).send({ message: ERROR_CODE400_MESSAGE });
       } else {
-        res.send({ message: ERROR_CODE500_MESSAGE });
+        res.status(500).send({ message: ERROR_CODE500_MESSAGE });
       }
     });
 };
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
+    .orFail(new Error('NotFound'))
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: ERROR_CODE404_MESSAGE_CARD });
-      } else if (err.name === 'NotFound') {
+        res.status(400).send({ message: ERROR_CODE400_MESSAGE });
+      } else if (err.message === 'NotFound') {
         res.status(404).send({ message: ERROR_CODE404_MESSAGE_CARD });
       } else {
         res.send({ message: ERROR_CODE500_MESSAGE });
@@ -45,12 +45,13 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(new Error('NotFound'))
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: ERROR_CODE400_MESSAGE_CARD_LIKE });
-      } else if (err.name === 'NotFound') {
-        res.status(400).send({ message: ERROR_CODE400_MESSAGE_CARD_LIKE });
+        res.status(400).send({ message: ERROR_CODE400_MESSAGE });
+      } else if (err.message === 'NotFound') {
+        res.status(404).send({ message: ERROR_CODE404_MESSAGE_CARD });
       } else {
         res.send({ message: ERROR_CODE500_MESSAGE });
       }
@@ -63,12 +64,13 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(new Error('NotFound'))
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: ERROR_CODE400_MESSAGE_CARD_LIKE });
-      } else if (err.name === 'NotFound') {
-        res.status(400).send({ message: ERROR_CODE400_MESSAGE_CARD_LIKE });
+        res.status(400).send({ message: ERROR_CODE400_MESSAGE });
+      } else if (err.message === 'NotFound') {
+        res.status(404).send({ message: ERROR_CODE404_MESSAGE_CARD });
       } else {
         res.send({ message: ERROR_CODE500_MESSAGE });
       }

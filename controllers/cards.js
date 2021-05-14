@@ -6,7 +6,7 @@ const ERROR_CODE404_MESSAGE_CARD = 'По данному id карточка не
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.send(cards))
+    .then((cards) => res.status(200).send(cards))
     .catch(() => res.status(500).send({ message: ERROR_CODE500_MESSAGE }));
 };
 
@@ -14,7 +14,7 @@ module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.send(card))
+    .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: ERROR_CODE400_MESSAGE });
@@ -27,14 +27,14 @@ module.exports.createCard = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail(new Error('NotFound'))
-    .then((card) => res.send(card))
+    .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: ERROR_CODE400_MESSAGE });
       } else if (err.message === 'NotFound') {
         res.status(404).send({ message: ERROR_CODE404_MESSAGE_CARD });
       } else {
-        res.send({ message: ERROR_CODE500_MESSAGE });
+        res.status(500).res.send({ message: ERROR_CODE500_MESSAGE });
       }
     });
 };
@@ -46,14 +46,14 @@ module.exports.likeCard = (req, res) => {
     { new: true },
   )
     .orFail(new Error('NotFound'))
-    .then((card) => res.send(card))
+    .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: ERROR_CODE400_MESSAGE });
       } else if (err.message === 'NotFound') {
         res.status(404).send({ message: ERROR_CODE404_MESSAGE_CARD });
       } else {
-        res.send({ message: ERROR_CODE500_MESSAGE });
+        res.status(500).res.send({ message: ERROR_CODE500_MESSAGE });
       }
     });
 };
@@ -65,14 +65,14 @@ module.exports.dislikeCard = (req, res) => {
     { new: true },
   )
     .orFail(new Error('NotFound'))
-    .then((card) => res.send(card))
+    .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: ERROR_CODE400_MESSAGE });
       } else if (err.message === 'NotFound') {
         res.status(404).send({ message: ERROR_CODE404_MESSAGE_CARD });
       } else {
-        res.send({ message: ERROR_CODE500_MESSAGE });
+        res.status(500).res.send({ message: ERROR_CODE500_MESSAGE });
       }
     });
 };

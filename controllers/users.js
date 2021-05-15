@@ -53,6 +53,8 @@ module.exports.updateInfo = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: ERROR_CODE400_MESSAGE });
+      } else if (err.name === 'CastError') {
+        res.status(400).send({ message: ERROR_CODE400_MESSAGE });
       } else {
         res.status(500).send({ message: ERROR_CODE500_MESSAGE });
       }
@@ -72,6 +74,8 @@ module.exports.updateAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
+        res.status(400).send({ message: ERROR_CODE400_MESSAGE });
+      } else if (err.name === 'CastError') {
         res.status(400).send({ message: ERROR_CODE400_MESSAGE });
       } else {
         res.status(500).send({ message: ERROR_CODE500_MESSAGE });

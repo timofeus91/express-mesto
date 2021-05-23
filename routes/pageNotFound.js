@@ -1,11 +1,14 @@
 const router = require('express').Router();
+const NotFoundPage = require('../errors/NoUserFoundError');
 
+// eslint-disable-next-line no-unused-vars
 router.get('*', (req, res) => {
-  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
+  throw new NotFoundPage('Запрашиваемый ресурс не найден');
 });
 
+// eslint-disable-next-line no-unused-vars
 router.post('*', (req, res) => {
-  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
+  throw new NotFoundPage('Запрашиваемый ресурс не найден');
 });
 
 module.exports = router;

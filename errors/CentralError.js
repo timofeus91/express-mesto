@@ -1,4 +1,4 @@
-module.exports.centralError = (err, req, res, next) => {
+module.exports = (err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res.status(statusCode).send({ message: statusCode === 500 ? 'Ошибка по умолчанию. Проверь код' : message });
   next();
